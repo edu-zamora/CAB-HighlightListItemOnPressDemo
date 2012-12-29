@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#99cc00" >
+    android:background="@drawable/list_item_selector_default" >
 
     <ImageView
         android:id="@+id/imageView1"
@@ -14,7 +14,6 @@
         android:id="@+id/the_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#ffffff"
         android:textSize="17sp"
         android:textStyle="bold" />
 

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -41,15 +40,16 @@ public class CABSelection extends SherlockListActivity {
 				R.layout.adapters_cabselection_row, R.id.the_text, mItems);
 		setListAdapter(mAdapter);
 		mListView = getListView();
+		mListView.setSelector(R.drawable.list_selector);
 		// TODO: Is this needed?
-		mListView.setItemsCanFocus(false);
+		// mListView.setItemsCanFocus(false);
 		mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				Log.i("TAG", "onItemLongClick");
-				
+
 				if (mMode == null) {
 					startActionMode(new ActionMode.Callback() {
 
@@ -130,11 +130,11 @@ public class CABSelection extends SherlockListActivity {
 
 					});
 				}
-				
+
 				SparseBooleanArray checkedPositions = mListView.getCheckedItemPositions();
 				mListView.setItemChecked(position, !checkedPositions.get(position));
 				onListItemClick(mListView, view, position, id);
-				
+
 				return true;
 			}
 		});
@@ -147,18 +147,18 @@ public class CABSelection extends SherlockListActivity {
 		}
 	}
 
-    private void uncheckAllItems() {
-    	mListView.clearChoices();
-    	mAdapter.notifyDataSetChanged();
-    }
-    	
-    private void checkAllItems() {
-    	int numItems = mListView.getCount();
-    	for (int position = 0; position < numItems; position++) {
-    		mListView.setItemChecked(position, true);
-    	}
-    }
-    
+	private void uncheckAllItems() {
+		mListView.clearChoices();
+		mAdapter.notifyDataSetChanged();
+	}
+
+	private void checkAllItems() {
+		int numItems = mListView.getCount();
+		for (int position = 0; position < numItems; position++) {
+			mListView.setItemChecked(position, true);
+		}
+	}
+
 	private class SelectionAdapter extends ArrayAdapter<String> {
 
 		public SelectionAdapter(Context context, int resource,
@@ -174,15 +174,15 @@ public class CABSelection extends SherlockListActivity {
 				return false;
 			}
 		}
-		
+
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View v = super.getView(position, convertView, parent);
 
-			if (isChecked(position)) {
-				v.setBackgroundColor(Color.RED);
+			if (mMode != null && isChecked(position)) {
+				v.setBackgroundResource(R.drawable.list_item_selector_highlighted);
 			} else {
-				v.setBackgroundColor(Color.parseColor("#99cc00"));
+				v.setBackgroundResource(R.drawable.list_item_selector_default);
 			}
 
 			return v;
