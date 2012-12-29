@@ -41,7 +41,7 @@ public class CABSelection extends SherlockListActivity {
 				R.layout.adapters_cabselection_row, R.id.the_text, mItems);
 		setListAdapter(mAdapter);
 		mListView = getListView();
-		mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		// TODO: Is this needed?
 		mListView.setItemsCanFocus(false);
 		mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 
@@ -49,8 +49,6 @@ public class CABSelection extends SherlockListActivity {
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				Log.i("TAG", "onItemLongClick");
-				SparseBooleanArray checkedPositions = mListView.getCheckedItemPositions();
-				mListView.setItemChecked(position, !checkedPositions.get(position));
 				
 				if (mMode == null) {
 					startActionMode(new ActionMode.Callback() {
@@ -58,6 +56,7 @@ public class CABSelection extends SherlockListActivity {
 						@Override
 						public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 							mMode = mode;
+							mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 							MenuInflater inflater = getSupportMenuInflater();
 							inflater.inflate(R.menu.cabselection_menu, menu);
 							return true;
@@ -125,12 +124,17 @@ public class CABSelection extends SherlockListActivity {
 						public void onDestroyActionMode(ActionMode mode) {
 							// TODO: Is the null assignment needed?
 							mMode = null;
+							mListView.setChoiceMode(ListView.CHOICE_MODE_NONE);
 							uncheckAllItems();
 						}
 
 					});
 				}
+				
+				SparseBooleanArray checkedPositions = mListView.getCheckedItemPositions();
+				mListView.setItemChecked(position, !checkedPositions.get(position));
 				onListItemClick(mListView, view, position, id);
+				
 				return true;
 			}
 		});
@@ -138,7 +142,9 @@ public class CABSelection extends SherlockListActivity {
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		mMode.invalidate();
+		if (mMode != null) {
+			mMode.invalidate();
+		}
 	}
 
     private void uncheckAllItems() {
@@ -160,12 +166,20 @@ public class CABSelection extends SherlockListActivity {
 			super(context, resource, textViewResourceId, objects);
 		}
 
+		public boolean isChecked(int position) {
+			SparseBooleanArray checked = mListView.getCheckedItemPositions();
+			if (checked != null) {
+				return checked.get(position);
+			} else {
+				return false;
+			}
+		}
+		
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View v = super.getView(position, convertView, parent);
 
-			SparseBooleanArray checked = mListView.getCheckedItemPositions();
-			if (checked.get(position)) {
+			if (isChecked(position)) {
 				v.setBackgroundColor(Color.RED);
 			} else {
 				v.setBackgroundColor(Color.parseColor("#99cc00"));
