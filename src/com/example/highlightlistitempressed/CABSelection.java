@@ -1,13 +1,17 @@
-package com.example.highlightlistitemclick;
+package com.example.highlightlistitempressed;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.SparseBooleanArray;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -41,6 +45,16 @@ public class CABSelection extends SherlockListActivity {
 		setListAdapter(mAdapter);
 		mListView = getListView();
 		mListView.setSelector(R.drawable.list_selector);
+
+		final GestureDetector gestureDetector = new GestureDetector(this, new ListGestureDetectorListener());
+		mListView.setOnTouchListener(new OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return gestureDetector.onTouchEvent(event);
+			}
+		});
+
 		// TODO: Is this needed?
 		// mListView.setItemsCanFocus(false);
 		mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -56,7 +70,8 @@ public class CABSelection extends SherlockListActivity {
 						@Override
 						public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 							mMode = mode;
-							mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+							mListView.setSelector(R.drawable.list_selector_cab);
+							mAdapter.notifyDataSetChanged();
 							MenuInflater inflater = getSupportMenuInflater();
 							inflater.inflate(R.menu.cabselection_menu, menu);
 							return true;
@@ -66,15 +81,7 @@ public class CABSelection extends SherlockListActivity {
 						public boolean onPrepareActionMode(ActionMode mode,
 								Menu menu) {
 
-							// TODO: Write a method for this
-							SparseBooleanArray checkedPositions = mListView.getCheckedItemPositions();
-							int nr = 0;
-							for (int i = 0; i < checkedPositions.size(); i++) {
-								if (checkedPositions.valueAt(i)) {
-									nr++;
-								}
-							}
-
+							int nr = mAdapter.getHighlightedPositionsCount();
 							// TODO: Use localization plurals for this
 							if (nr == 1) {
 								mode.setTitle(nr + " row");
@@ -89,19 +96,17 @@ public class CABSelection extends SherlockListActivity {
 						public boolean onActionItemClicked(ActionMode mode,
 								MenuItem item) {
 							StringBuilder sb = new StringBuilder();
-							SparseBooleanArray positions = mListView.getCheckedItemPositions();
+							List<Integer> positions = mAdapter.getHighlightedPositions();
 							for (int i = 0; i < positions.size(); i++) {
-								if (positions.get(i)) {
-									sb.append(" " + i + ",");	
-								}
+								sb.append(" " + i + ",");	
 							}               
 							switch (item.getItemId()) {
 							case R.id.select_none:
-								uncheckAllItems();
+								mAdapter.unhighlightAllItems();
 								mode.invalidate();
 								break;
 							case R.id.select_all:
-								checkAllItems();
+								mAdapter.highlightAllItems();
 								mode.invalidate();
 								break;
 							case R.id.edit_entry:
@@ -124,15 +129,13 @@ public class CABSelection extends SherlockListActivity {
 						public void onDestroyActionMode(ActionMode mode) {
 							// TODO: Is the null assignment needed?
 							mMode = null;
-							mListView.setChoiceMode(ListView.CHOICE_MODE_NONE);
-							uncheckAllItems();
+							mListView.setSelector(R.drawable.list_selector);
+							mAdapter.unhighlightAllItems();
 						}
 
 					});
 				}
 
-				SparseBooleanArray checkedPositions = mListView.getCheckedItemPositions();
-				mListView.setItemChecked(position, !checkedPositions.get(position));
 				onListItemClick(mListView, view, position, id);
 
 				return true;
@@ -140,46 +143,107 @@ public class CABSelection extends SherlockListActivity {
 		});
 	}
 
+	class ListGestureDetectorListener extends SimpleOnGestureListener {
+
+		@Override
+		public void onShowPress(MotionEvent e) {
+			Log.i("TAG", "onShowPress");
+			if (mMode != null) {
+				int position = mListView.pointToPosition((int) e.getX(), (int) e.getY());
+				mAdapter.pressItem(position);	
+			}
+		}
+
+	}
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		if (mMode != null) {
+			mAdapter.toogleHighlightItem(position);
 			mMode.invalidate();
 		}
 	}
 
-	private void uncheckAllItems() {
-		mListView.clearChoices();
-		mAdapter.notifyDataSetChanged();
-	}
-
-	private void checkAllItems() {
-		int numItems = mListView.getCount();
-		for (int position = 0; position < numItems; position++) {
-			mListView.setItemChecked(position, true);
-		}
-	}
-
 	private class SelectionAdapter extends ArrayAdapter<String> {
+
+		HashMap<Integer, Boolean> mWasHighlightedBeforePress = new HashMap<Integer, Boolean>();
+		HashMap<Integer, Boolean> mHighlightedItems = new HashMap<Integer, Boolean>();
 
 		public SelectionAdapter(Context context, int resource,
 				int textViewResourceId, List<String> objects) {
 			super(context, resource, textViewResourceId, objects);
 		}
 
-		public boolean isChecked(int position) {
-			SparseBooleanArray checked = mListView.getCheckedItemPositions();
-			if (checked != null) {
-				return checked.get(position);
+		public void pressItem(int position) {
+			mHighlightedItems.put(position, true);
+			notifyDataSetChanged();
+		}
+
+		public void toogleHighlightItem(int position) {
+			boolean shouldHighlight = !wasHighlightedBeforePress(position);
+			mHighlightedItems.put(position, shouldHighlight);
+			mWasHighlightedBeforePress.put(position, shouldHighlight);
+			notifyDataSetChanged();
+		}
+
+		public boolean wasHighlightedBeforePress(int position) {
+			Boolean wasHighlighted = mWasHighlightedBeforePress.get(position);
+			if (wasHighlighted != null) {
+				return wasHighlighted;
 			} else {
 				return false;
 			}
 		}
 
+		public boolean isHighlighted(int position) {
+			Boolean isHighlighted = mHighlightedItems.get(position);
+			if (isHighlighted != null) {
+				return isHighlighted;
+			} else {
+				return false;
+			}
+		}
+
+		public List<Integer> getHighlightedPositions() {
+			List<Integer> highlightedPositions = new ArrayList<Integer>();
+
+			for (int position = 0; position < mHighlightedItems.size(); position++) {
+				if (isHighlighted(position)) {
+					highlightedPositions.add(position);
+				}
+			}
+
+			return highlightedPositions;
+		}
+
+		public int getHighlightedPositionsCount() {			
+			return getHighlightedPositions().size();
+		}
+
+		private void unhighlightAllItems() {
+			mListView.clearChoices();
+			int numItems = mListView.getCount();
+			for (int position = 0; position < numItems; position++) {
+				mHighlightedItems.put(position, false);
+				mWasHighlightedBeforePress.put(position, false);
+			}
+			mAdapter.notifyDataSetChanged();
+		}
+
+		private void highlightAllItems() {
+			int numItems = mListView.getCount();
+			for (int position = 0; position < numItems; position++) {
+				mHighlightedItems.put(position, true);
+				mWasHighlightedBeforePress.put(position, true);
+			}
+			mAdapter.notifyDataSetChanged();
+		}
+		
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View v = super.getView(position, convertView, parent);
 
-			if (mMode != null && isChecked(position)) {
+			if (isHighlighted(position)) {
 				v.setBackgroundResource(R.drawable.list_item_selector_highlighted);
 			} else {
 				v.setBackgroundResource(R.drawable.list_item_selector_default);
