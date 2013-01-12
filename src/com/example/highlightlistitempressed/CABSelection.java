@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
@@ -25,7 +24,7 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.example.highlightlistitempressed.PressedListView.OnTrackballEventListener;
+import com.example.highlightlistitempressed.PressedListView.OnItemPressListener;
 
 public class CABSelection extends SherlockActivity {
 
@@ -33,7 +32,6 @@ public class CABSelection extends SherlockActivity {
 	private PressedListView mListView;
 	private SelectionAdapter mAdapter;
 	private ActionMode mMode;
-	private int mFocusedItemPosition;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,28 +56,12 @@ public class CABSelection extends SherlockActivity {
 				return gestureDetector.onTouchEvent(event);
 			}
 		});
-		mListView.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> arg0, View arg1,
-					int position, long arg3) {
-				Log.i("TAG", "onItemSelected");
-				mFocusedItemPosition = position;
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				Log.i("TAG", "onNothingSelected");
-			}
-		});
 		
-		mListView.setOnTrackballEventListener(new OnTrackballEventListener() {
+		mListView.setOnItemPressListener(new OnItemPressListener() {
 			
 			@Override
-			public void onTrackballEvent(MotionEvent event) {
-				if(event.getAction() == MotionEvent.ACTION_DOWN) {
-					onListItemPress(mFocusedItemPosition);	
-				}
+			public void onItemPress(int position) {
+				onListItemPress(position);
 			}
 		});
 		
