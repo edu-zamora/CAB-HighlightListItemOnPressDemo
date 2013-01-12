@@ -7,11 +7,7 @@ import java.util.List;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -48,15 +44,6 @@ public class CABSelection extends SherlockActivity {
 		mListView.setAdapter(mAdapter);
 		mListView.setSelector(R.drawable.list_selector);
 
-		final GestureDetector gestureDetector = new GestureDetector(this, new ListGestureDetectorListener());
-		mListView.setOnTouchListener(new OnTouchListener() {
-
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				return gestureDetector.onTouchEvent(event);
-			}
-		});
-		
 		mListView.setOnItemPressListener(new OnItemPressListener() {
 			
 			@Override
@@ -161,17 +148,6 @@ public class CABSelection extends SherlockActivity {
 				return true;
 			}
 		});
-	}
-
-	class ListGestureDetectorListener extends SimpleOnGestureListener {
-
-		@Override
-		public void onShowPress(MotionEvent e) {
-			Log.i("TAG", "onShowPress");
-			int position = mListView.pointToPosition((int) e.getX(), (int) e.getY());
-			onListItemPress(position);
-		}
-
 	}
 
 	public void onListItemPress(int position) {
