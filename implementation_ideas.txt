@@ -1,0 +1,32 @@
+IDEAS ON HOW TO KNOW WHEN A VIEW IS PRESSED:
+
+1) Use GestureDetector and its showPress method for touches and
+   keep the current selected view and detect the d-pad down event for d-pad.
+   We could hide all this behind a onPressListener callback, defined by a view extending ListView. 
+   (being implemented)
+   
+2) Study how the state state_pressed works and when it is set and unset (in View.java).
+   Could we use it/change it somehow? Could we create another state (look for a good name for it) that is
+   set automatically on press but it is not unset automatically?
+   Take a look at View.onTouchEvent, View.onKeyDown, View.onKeyUp
+   
+3) Create a subclass of ListView that completely handles the new state (highlighted), setting it and unsetting it
+   at the appropriate times.
+   It should:
+   - Detect when a press would be performed in an item
+   - Detect when a click is finished for an item (on up) 
+   
+   
+NOTES:
+- In case we need to emulate the haptic feedback used by onLongClick, take a look at View.performLongClick
+- How to know which states are being activated?
+- For the problem detecting long clicks, try to set focusableInTouchMode to false (it seems that the state focused is activated)
+
+- How do drawable states relate to the different user actions (press, click, long click)?
+  Which exactly are the possible user actions?
+  For a ListView, how do affect to each other the selector of the list with the selector of the items?
+  
+- How to use the standard listeners while implementing a new widget, forbid users of this new widget to use the standard ones
+  but provide them with another listeners with the same exact signature? Maybe take a look at ActionBarSherlock
+
+   

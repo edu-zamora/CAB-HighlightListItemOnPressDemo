@@ -14,36 +14,40 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.example.highlightlistitempressed.PressedListView.OnTrackballEventListener;
 
-public class CABSelection extends SherlockListActivity {
+public class CABSelection extends SherlockActivity {
 
 	private ArrayList<String> mItems = new ArrayList<String>();
-	private ListView mListView;
+	private PressedListView mListView;
 	private SelectionAdapter mAdapter;
 	private ActionMode mMode;
+	private int mFocusedItemPosition;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		setContentView(R.layout.cab_selection);
+		
 		for (int i = 0; i < 24; i++) {
 			mItems.add("Name" + i);
 		}
 
 		mAdapter = new SelectionAdapter(this,
 				R.layout.adapters_cabselection_row, R.id.the_text, mItems);
-		setListAdapter(mAdapter);
-		mListView = getListView();
+		mListView = (PressedListView) findViewById(R.id.list);
+		mListView.setAdapter(mAdapter);
 		mListView.setSelector(R.drawable.list_selector);
 
 		final GestureDetector gestureDetector = new GestureDetector(this, new ListGestureDetectorListener());
@@ -54,9 +58,43 @@ public class CABSelection extends SherlockListActivity {
 				return gestureDetector.onTouchEvent(event);
 			}
 		});
+		mListView.setOnItemSelectedListener(new OnItemSelectedListener() {
 
+			@Override
+			public void onItemSelected(AdapterView<?> arg0, View arg1,
+					int position, long arg3) {
+				Log.i("TAG", "onItemSelected");
+				mFocusedItemPosition = position;
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				Log.i("TAG", "onNothingSelected");
+			}
+		});
+		
+		mListView.setOnTrackballEventListener(new OnTrackballEventListener() {
+			
+			@Override
+			public void onTrackballEvent(MotionEvent event) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN) {
+					onListItemPress(mFocusedItemPosition);	
+				}
+			}
+		});
+		
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				onListItemClick(position);
+			}
+
+		});
+		
 		// TODO: Is this needed?
-		// mListView.setItemsCanFocus(false);
+		mListView.setItemsCanFocus(false);
+		mListView.setFocusableInTouchMode(false);
 		mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 
 			@Override
@@ -136,7 +174,7 @@ public class CABSelection extends SherlockListActivity {
 					});
 				}
 
-				onListItemClick(mListView, view, position, id);
+				onListItemClick(position);
 
 				return true;
 			}
@@ -148,22 +186,26 @@ public class CABSelection extends SherlockListActivity {
 		@Override
 		public void onShowPress(MotionEvent e) {
 			Log.i("TAG", "onShowPress");
-			if (mMode != null) {
-				int position = mListView.pointToPosition((int) e.getX(), (int) e.getY());
-				mAdapter.pressItem(position);	
-			}
+			int position = mListView.pointToPosition((int) e.getX(), (int) e.getY());
+			onListItemPress(position);
 		}
 
 	}
 
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
+	public void onListItemPress(int position) {
+		if (mMode != null) {
+			mAdapter.pressItem(position);
+			mMode.invalidate();
+		}
+	}
+	
+	public void onListItemClick(int position) {
 		if (mMode != null) {
 			mAdapter.toogleHighlightItem(position);
 			mMode.invalidate();
 		}
 	}
-
+	
 	private class SelectionAdapter extends ArrayAdapter<String> {
 
 		HashMap<Integer, Boolean> mWasHighlightedBeforePress = new HashMap<Integer, Boolean>();
