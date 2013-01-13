@@ -3,12 +3,12 @@
 
     <item
         android:id="@+id/select_none"
-        android:title="None"
-        android:showAsAction="always"/>
+        android:showAsAction="always"
+        android:title="None"/>
     <item
         android:id="@+id/select_all"
-        android:title="All"
-        android:showAsAction="always"/>
+        android:showAsAction="always"
+        android:title="All"/>
     <item
         android:id="@+id/edit_entry"
         android:icon="@android:drawable/ic_menu_edit"
@@ -17,9 +17,5 @@
         android:id="@+id/delete_entry"
         android:icon="@android:drawable/ic_menu_delete"
         android:title="Delete!"/>
-    <item
-        android:id="@+id/finish_it"
-        android:icon="@android:drawable/ic_menu_crop"
-        android:title="Get me out!"/>
 
 </menu>

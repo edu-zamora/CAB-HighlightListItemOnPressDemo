@@ -2,6 +2,7 @@ package com.example.highlightlistitempressed;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
@@ -160,9 +161,13 @@ public class PressListView extends ListView {
 	//-- Helper methods--------------------------------------------------------
 
 	private void notifyItemPress(int position) {
-		if (mOnItemPressListener != null) {
+		if (mOnItemPressListener != null && validPosition(position)) {
 			mOnItemPressListener.onItemPress(position);
 		}
+	}
+	
+	private boolean validPosition(int position) {
+		return 0 <= position && position <= (getCount() - 1);
 	}
 	
 	private int positionFromMotionEvent(MotionEvent event) {

@@ -1,8 +1,6 @@
 package com.example.highlightlistitempressed;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
@@ -91,7 +89,6 @@ public class CABSelection extends SherlockActivity {
 								Menu menu) {
 
 							int nr = mAdapter.getHighlightedPositionsCount();
-							Log.i("CABSelection", "onPrepareActionMode num selected items = " + nr);
 							// TODO: Use localization plurals for this
 							if (nr == 1) {
 								mode.setTitle(nr + " row");
@@ -127,10 +124,6 @@ public class CABSelection extends SherlockActivity {
 								Toast.makeText(CABSelection.this, "Deleted entries : " + sb.toString(),
 										Toast.LENGTH_SHORT).show();
 								break;
-							case R.id.finish_it:
-								Toast.makeText(CABSelection.this, "Finish the CAB!",
-										Toast.LENGTH_SHORT).show();
-								mode.finish();
 							}
 							return false;
 						}
@@ -155,18 +148,13 @@ public class CABSelection extends SherlockActivity {
 
 	public void onListItemPress(int position) {
 		if (mMode != null) {
-			Log.i("CABSelection", "onListItemPress before pressItem");
 			mAdapter.pressItem(position);
-			Log.i("CABSelection", "onListItemPress after pressItem");
-			mMode.invalidate();
 		}
 	}
 	
 	public void onListItemClick(int position) {
 		if (mMode != null) {
-			Log.i("CABSelection", "onListItemClick before toogleHighlightItem");
 			mAdapter.toogleHighlightItem(position);
-			Log.i("CABSelection", "onListItemClick after toogleHighlightItem");
 			mMode.invalidate();
 		}
 	}
@@ -206,10 +194,8 @@ public class CABSelection extends SherlockActivity {
 
 			int numPositions = mHighlightedItems.size();
 			for(int i = 0; i < numPositions; i++) {
-				Log.i("CABSelection", "getHighlightedPositions - mHighlightedItems size = " + mHighlightedItems.size());
 				int position = mHighlightedItems.keyAt(i);
 				if (isHighlighted(position)) {
-					Log.i("CABSelection", "position " + position + " highlighted!");
 					highlightedPositions.add(position);
 				}
 			}
@@ -218,13 +204,12 @@ public class CABSelection extends SherlockActivity {
 		}
 
 		public int getHighlightedPositionsCount() {
-			Log.i("CABSelection", "getHighlightedPoisitionsCount");
 			return getHighlightedPositions().size();
 		}
 
 		private void unhighlightAllItems() {
 			mListView.clearChoices();
-			int numItems = mListView.getCount();
+			int numItems = getCount();
 			for (int position = 0; position < numItems; position++) {
 				mHighlightedItems.put(position, false);
 				mWasHighlightedBeforePress.put(position, false);
@@ -233,7 +218,7 @@ public class CABSelection extends SherlockActivity {
 		}
 
 		private void highlightAllItems() {
-			int numItems = mListView.getCount();
+			int numItems = getCount();
 			for (int position = 0; position < numItems; position++) {
 				mHighlightedItems.put(position, true);
 				mWasHighlightedBeforePress.put(position, true);
