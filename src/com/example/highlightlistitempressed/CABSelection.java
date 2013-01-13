@@ -8,6 +8,7 @@ import java.util.List;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -172,8 +173,8 @@ public class CABSelection extends SherlockActivity {
 	
 	private class SelectionAdapter extends ArrayAdapter<String> {
 
-		HashMap<Integer, Boolean> mWasHighlightedBeforePress = new HashMap<Integer, Boolean>();
-		HashMap<Integer, Boolean> mHighlightedItems = new HashMap<Integer, Boolean>();
+		SparseBooleanArray mWasHighlightedBeforePress = new SparseBooleanArray();
+		SparseBooleanArray mHighlightedItems = new SparseBooleanArray();
 
 		public SelectionAdapter(Context context, int resource,
 				int textViewResourceId, List<String> objects) {
@@ -193,31 +194,20 @@ public class CABSelection extends SherlockActivity {
 		}
 
 		public boolean wasHighlightedBeforePress(int position) {
-			Boolean wasHighlighted = mWasHighlightedBeforePress.get(position);
-			if (wasHighlighted != null) {
-				return wasHighlighted;
-			} else {
-				return false;
-			}
+			return mWasHighlightedBeforePress.get(position);
 		}
 
 		public boolean isHighlighted(int position) {
-			Boolean isHighlighted = mHighlightedItems.get(position);
-			if (isHighlighted != null) {
-				Log.i("CABSelection", "isHighlighted not null = " + isHighlighted);
-				return isHighlighted;
-			} else {
-				Log.i("CABSelection", "isHighlighted null = false");
-				return false;
-			}
+			return mHighlightedItems.get(position);
 		}
 
 		public List<Integer> getHighlightedPositions() {
 			List<Integer> highlightedPositions = new ArrayList<Integer>();
 
-			int numPositions = getCount();
-			for(int position = 0; position < numPositions; position++) {
+			int numPositions = mHighlightedItems.size();
+			for(int i = 0; i < numPositions; i++) {
 				Log.i("CABSelection", "getHighlightedPositions - mHighlightedItems size = " + mHighlightedItems.size());
+				int position = mHighlightedItems.keyAt(i);
 				if (isHighlighted(position)) {
 					Log.i("CABSelection", "position " + position + " highlighted!");
 					highlightedPositions.add(position);
