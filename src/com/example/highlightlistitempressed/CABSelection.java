@@ -5,7 +5,6 @@ import java.util.List;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,18 +31,16 @@ public class CABSelection extends SherlockActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.cab_selection);
+		setContentView(R.layout.cab_selection_layout);
 
 		for (int i = 0; i < 24; i++) {
 			mItems.add("Name" + i);
 		}
 
-		mAdapter = new SelectionAdapter(this, R.layout.adapters_cabselection_row, R.id.the_text, mItems);
+		mAdapter = new SelectionAdapter(this, R.layout.cab_selection_item, R.id.the_text, mItems);
 		mListView = (PressListView) findViewById(R.id.list);
 		mListView.setAdapter(mAdapter);
 		mListView.setSelector(R.drawable.list_selector);
-		// TODO: Is this needed?
-		mListView.setItemsCanFocus(false);
 		mListView.setFocusableInTouchMode(false);
 
 		mListView.setOnItemPressListener(new OnItemPressListener() {
@@ -66,9 +63,7 @@ public class CABSelection extends SherlockActivity {
 		mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 
 			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				Log.i("TAG", "onItemLongClick");
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
 				if (mMode == null) {
 					startActionMode(new ActionModeCallback());
@@ -99,7 +94,7 @@ public class CABSelection extends SherlockActivity {
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = getSupportMenuInflater();
-			inflater.inflate(R.menu.cabselection_menu, menu);
+			inflater.inflate(R.menu.cab_selection_menu, menu);
 
 			mMode = mode;
 			mListView.setSelector(R.drawable.list_selector_cab);
@@ -153,7 +148,6 @@ public class CABSelection extends SherlockActivity {
 		
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
-			// TODO: Is the null assignment needed?
 			mMode = null;
 			mListView.setSelector(R.drawable.list_selector);
 			mAdapter.unhighlightAllItems();	

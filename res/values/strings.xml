@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">HighlightListItemPressed</string>
-    <string name="menu_settings">Settings</string>
 
     <plurals name="number_of_selected_rows">
         <item quantity="one">1 row</item>

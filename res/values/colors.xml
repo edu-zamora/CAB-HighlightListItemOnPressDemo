@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="red">#900</color>
-    <color name="green">#090</color>
-    <color name="blue">#009</color>
-    <color name="white">#FFF</color>
-    <color name="black">#000</color>
-    <color name="yellow">#FCDC3B</color>
-    <color name="grey">#FF666666</color>
-    <color name="light_green">#FF99CC00</color>
     <color name="light_green_pressed">#8099CC00</color>
     <color name="light_green_focused">#4099CC00</color>
 

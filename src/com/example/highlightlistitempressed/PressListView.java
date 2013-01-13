@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,12 +20,16 @@ public class PressListView extends ListView {
 
 	private static final int INVALID_POSITION = -1;
 	
+	private GestureDetector mGestureDetector;
+	
 	private final ForwardingOnTouchListener mForwardingOnTouchListener = new ForwardingOnTouchListener();
 	private final ForwardingOnItemSelectedListener mForwardingOnItemSelectedListener = new ForwardingOnItemSelectedListener();
+	private final ForwardingOnItemClickListener mForwardingOnItemClickListener = new ForwardingOnItemClickListener();
 	
 	private OnItemPressListener mOnItemPressListener;
+	private OnItemLongClickListener mOnItemLongClickListener;
 	
-	private GestureDetector mGestureDetector;
+	private boolean mWasConsumedByLongClick = false;
 	
 	private int mFocusedItemPosition = INVALID_POSITION;
 
@@ -49,22 +54,76 @@ public class PressListView extends ListView {
 		mForwardingOnTouchListener.selfListener = mOnTouchListener;
 		super.setOnItemSelectedListener(mForwardingOnItemSelectedListener);
 		mForwardingOnItemSelectedListener.selfListener = mOnItemSelectedListener;
+		super.setOnItemClickListener(mForwardingOnItemClickListener);
 	}
 
 	public void setOnItemPressListener(OnItemPressListener listener) {
 		mOnItemPressListener = listener;
 	}
-	
+
+	//-- Touch listener: used for detecting touch presses ---------------------
+
 	@Override
 	public void setOnTouchListener(OnTouchListener listener) {
 		mForwardingOnTouchListener.clientListener = listener;
 	}
 	
+	//-- Item selected listener: used for d-pad/trackpad presses --------------
+
 	@Override
 	public void setOnItemSelectedListener(OnItemSelectedListener listener) {
 		mForwardingOnItemSelectedListener.clientListener = listener;
 	}
 
+	//-- Item long click & item click -----------------------------------------
+	
+	// NB:
+	// We handle onItemLongClick manually here because the system onItemLongClick
+	// callback is not always correctly called (from time to time, one callback is not made).
+	// Doing that, makes us also handle onItemClick manually, so we only call it
+	// when our onItemLongClick callback did not consume the event
+	
+	@Override
+	public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+		mOnItemLongClickListener = listener;
+		super.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+				if (isInTouchMode()) {
+					// Touch long clicks are handled using the GestureDetector
+					return false;
+				} else {
+					// d-pad/trackpad long clicks are handled normally
+					if (mOnItemLongClickListener != null) {
+						return mOnItemLongClickListener.onItemLongClick(parent, view, position, id);
+					}
+				}
+				
+				return false;
+			}
+		});
+	}
+	
+	@Override
+	public void setOnItemClickListener(OnItemClickListener listener) {
+		mForwardingOnItemClickListener.clientListener = listener;
+	}
+	
+	private class ForwardingOnItemClickListener implements OnItemClickListener {
+
+		private OnItemClickListener clientListener;
+		
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			if (clientListener != null && !mWasConsumedByLongClick) {
+				clientListener.onItemClick(parent, view, position, id);
+			}
+			mWasConsumedByLongClick = false;
+		}
+		
+	}
+	
 	//-- Touch Presses --------------------------------------------------------
 
 	private static class ForwardingOnTouchListener implements OnTouchListener {
@@ -101,6 +160,14 @@ public class PressListView extends ListView {
 			int position = positionFromMotionEvent(e);
 			notifyItemPress(position);
 		}
+
+		@Override
+		public void onLongPress(MotionEvent e) {
+			super.onLongPress(e);
+			int position = positionFromMotionEvent(e);
+			notifyItemLongClick(position);
+		}
+
 		
 	}
 		
@@ -162,6 +229,15 @@ public class PressListView extends ListView {
 	private void notifyItemPress(int position) {
 		if (mOnItemPressListener != null && validPosition(position)) {
 			mOnItemPressListener.onItemPress(position);
+		}
+	}
+	
+	private void notifyItemLongClick(int position) {
+		if (mOnItemLongClickListener != null && validPosition(position)) {
+			mWasConsumedByLongClick = mOnItemLongClickListener.onItemLongClick(this, getChildAt(position), position, getAdapter().getItemId(position));
+			if (mWasConsumedByLongClick) {
+				performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+			}
 		}
 	}
 	
