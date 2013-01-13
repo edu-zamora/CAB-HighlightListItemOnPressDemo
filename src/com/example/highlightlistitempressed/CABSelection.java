@@ -2,6 +2,7 @@ package com.example.highlightlistitempressed;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
@@ -20,12 +21,12 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.example.highlightlistitempressed.PressedListView.OnItemPressListener;
+import com.example.highlightlistitempressed.PressListView.OnItemPressListener;
 
 public class CABSelection extends SherlockActivity {
 
 	private ArrayList<String> mItems = new ArrayList<String>();
-	private PressedListView mListView;
+	private PressListView mListView;
 	private SelectionAdapter mAdapter;
 	private ActionMode mMode;
 
@@ -40,7 +41,7 @@ public class CABSelection extends SherlockActivity {
 
 		mAdapter = new SelectionAdapter(this,
 				R.layout.adapters_cabselection_row, R.id.the_text, mItems);
-		mListView = (PressedListView) findViewById(R.id.list);
+		mListView = (PressListView) findViewById(R.id.list);
 		mListView.setAdapter(mAdapter);
 		mListView.setSelector(R.drawable.list_selector);
 
@@ -89,6 +90,7 @@ public class CABSelection extends SherlockActivity {
 								Menu menu) {
 
 							int nr = mAdapter.getHighlightedPositionsCount();
+							Log.i("CABSelection", "onPrepareActionMode num selected items = " + nr);
 							// TODO: Use localization plurals for this
 							if (nr == 1) {
 								mode.setTitle(nr + " row");
@@ -152,14 +154,18 @@ public class CABSelection extends SherlockActivity {
 
 	public void onListItemPress(int position) {
 		if (mMode != null) {
+			Log.i("CABSelection", "onListItemPress before pressItem");
 			mAdapter.pressItem(position);
+			Log.i("CABSelection", "onListItemPress after pressItem");
 			mMode.invalidate();
 		}
 	}
 	
 	public void onListItemClick(int position) {
 		if (mMode != null) {
+			Log.i("CABSelection", "onListItemClick before toogleHighlightItem");
 			mAdapter.toogleHighlightItem(position);
+			Log.i("CABSelection", "onListItemClick after toogleHighlightItem");
 			mMode.invalidate();
 		}
 	}
@@ -198,8 +204,10 @@ public class CABSelection extends SherlockActivity {
 		public boolean isHighlighted(int position) {
 			Boolean isHighlighted = mHighlightedItems.get(position);
 			if (isHighlighted != null) {
+				Log.i("CABSelection", "isHighlighted not null = " + isHighlighted);
 				return isHighlighted;
 			} else {
+				Log.i("CABSelection", "isHighlighted null = false");
 				return false;
 			}
 		}
@@ -207,8 +215,11 @@ public class CABSelection extends SherlockActivity {
 		public List<Integer> getHighlightedPositions() {
 			List<Integer> highlightedPositions = new ArrayList<Integer>();
 
-			for (int position = 0; position < mHighlightedItems.size(); position++) {
+			int numPositions = getCount();
+			for(int position = 0; position < numPositions; position++) {
+				Log.i("CABSelection", "getHighlightedPositions - mHighlightedItems size = " + mHighlightedItems.size());
 				if (isHighlighted(position)) {
+					Log.i("CABSelection", "position " + position + " highlighted!");
 					highlightedPositions.add(position);
 				}
 			}
@@ -216,7 +227,8 @@ public class CABSelection extends SherlockActivity {
 			return highlightedPositions;
 		}
 
-		public int getHighlightedPositionsCount() {			
+		public int getHighlightedPositionsCount() {
+			Log.i("CABSelection", "getHighlightedPoisitionsCount");
 			return getHighlightedPositions().size();
 		}
 

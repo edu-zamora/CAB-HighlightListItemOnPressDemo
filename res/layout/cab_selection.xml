@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
-    <com.example.highlightlistitempressed.PressedListView
+    <com.example.highlightlistitempressed.PressListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
