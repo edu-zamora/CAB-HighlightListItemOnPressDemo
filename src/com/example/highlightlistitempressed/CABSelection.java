@@ -33,7 +33,7 @@ public class CABSelection extends SherlockActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cab_selection);
-		
+
 		for (int i = 0; i < 24; i++) {
 			mItems.add("Name" + i);
 		}
@@ -45,15 +45,15 @@ public class CABSelection extends SherlockActivity {
 		// TODO: Is this needed?
 		mListView.setItemsCanFocus(false);
 		mListView.setFocusableInTouchMode(false);
-		
+
 		mListView.setOnItemPressListener(new OnItemPressListener() {
-			
+
 			@Override
 			public void onItemPress(int position) {
 				onListItemPress(position);
 			}
 		});
-		
+
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -86,39 +86,34 @@ public class CABSelection extends SherlockActivity {
 			mAdapter.pressItem(position);
 		}
 	}
-	
+
 	public void onListItemClick(int position) {
 		if (mMode != null) {
 			mAdapter.toogleHighlightItem(position);
 			mMode.invalidate();
 		}
 	}
-	
+
 	private class ActionModeCallback implements ActionMode.Callback {
-		
+
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			MenuInflater inflater = getSupportMenuInflater();
+			inflater.inflate(R.menu.cabselection_menu, menu);
+
 			mMode = mode;
 			mListView.setSelector(R.drawable.list_selector_cab);
 			mAdapter.notifyDataSetChanged();
-			MenuInflater inflater = getSupportMenuInflater();
-			inflater.inflate(R.menu.cabselection_menu, menu);
 			return true;
 		}
-		
+
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			int nr = mAdapter.getHighlightedPositionsCount();
-			// TODO: Use localization plurals for this
-			if (nr == 1) {
-				mode.setTitle(nr + " row");
-			} else {
-				mode.setTitle(nr + " rows");	
-			}
+			updateTitle(mode);
 
 			return false;
 		}
-		
+
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			StringBuilder sb = new StringBuilder();
@@ -146,7 +141,7 @@ public class CABSelection extends SherlockActivity {
 			}
 			return false;
 		}
-		
+
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
 			// TODO: Is the null assignment needed?
@@ -154,7 +149,13 @@ public class CABSelection extends SherlockActivity {
 			mListView.setSelector(R.drawable.list_selector);
 			mAdapter.unhighlightAllItems();	
 		}
-		
+
+		private void updateTitle(ActionMode mode) {
+			int highlightedItemsCount = mAdapter.getHighlightedPositionsCount();
+			String actionModeTitle = getResources().getQuantityString(R.plurals.number_of_selected_rows, highlightedItemsCount, highlightedItemsCount);
+			mode.setTitle(actionModeTitle);
+		}
+
 	};
 
 	private class SelectionAdapter extends ArrayAdapter<String> {
@@ -222,7 +223,7 @@ public class CABSelection extends SherlockActivity {
 			}
 			mAdapter.notifyDataSetChanged();
 		}
-		
+
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View v = super.getView(position, convertView, parent);

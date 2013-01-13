@@ -2,7 +2,11 @@
 <resources>
 
     <string name="app_name">HighlightListItemPressed</string>
-    <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
+
+    <plurals name="number_of_selected_rows">
+        <item quantity="one">1 row</item>
+        <item quantity="other">%d rows</item>
+    </plurals>
 
 </resources>
