@@ -1,4 +1,4 @@
-package com.example.highlightlistitempressed;
+package com.eduzamora.android.highlightlistitemonpress.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;

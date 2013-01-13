@@ -1,4 +1,4 @@
-package com.example.highlightlistitempressed;
+package com.eduzamora.android.highlightlistitemonpress;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +19,12 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.example.highlightlistitempressed.PressListView.OnItemPressListener;
+import com.eduzamora.android.highlightlistitemonpress.R;
+import com.eduzamora.android.highlightlistitemonpress.widget.PressListView;
+import com.eduzamora.android.highlightlistitemonpress.widget.PressListView.OnItemPressListener;
 
-public class CABSelection extends SherlockActivity {
+public class MainActivity extends SherlockActivity {
 
-	private ArrayList<String> mItems = new ArrayList<String>();
 	private PressListView mListView;
 	private SelectionAdapter mAdapter;
 	private ActionMode mMode;
@@ -33,11 +34,7 @@ public class CABSelection extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cab_selection_layout);
 
-		for (int i = 0; i < 24; i++) {
-			mItems.add("Name" + i);
-		}
-
-		mAdapter = new SelectionAdapter(this, R.layout.cab_selection_item, R.id.the_text, mItems);
+		mAdapter = new SelectionAdapter(this, R.layout.cab_selection_item, R.id.sushi_name, SUSHIS);
 		mListView = (PressListView) findViewById(R.id.list);
 		mListView.setAdapter(mAdapter);
 		mListView.setSelector(R.drawable.list_selector);
@@ -120,11 +117,11 @@ public class CABSelection extends SherlockActivity {
 				mode.invalidate();
 				break;
 			case R.id.edit_entry:
-				Toast.makeText(CABSelection.this, "Edited items: " + highlightedItemsString(),
+				Toast.makeText(MainActivity.this, "Modified sushi: " + highlightedItemsString(),
 						Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.delete_entry:
-				Toast.makeText(CABSelection.this, "Deleted items: " + highlightedItemsString(),
+				Toast.makeText(MainActivity.this, "Rotten sushi :( : " + highlightedItemsString(),
 						Toast.LENGTH_SHORT).show();
 				break;
 			}
@@ -133,19 +130,24 @@ public class CABSelection extends SherlockActivity {
 
 		private String highlightedItemsString() {
 			StringBuilder stringBuilder = new StringBuilder();
-			
+
 			List<Integer> positions = mAdapter.getHighlightedPositions();
-			for (int i = 0; i < positions.size(); i++) {
-				if (i != (positions.size() - 1)) {
-					stringBuilder.append(" " + positions.get(i) + ",");
-				} else {
-					stringBuilder.append(" " + positions.get(i) + ".");
+			if (positions.isEmpty()) {
+				stringBuilder.append("None.");
+			} else {
+				for (int i = 0; i < positions.size(); i++) {
+					int numberToShow = positions.get(i) + 1;
+					if (i != (positions.size() - 1)) {
+						stringBuilder.append(" " + numberToShow + ",");
+					} else {
+						stringBuilder.append(" " + numberToShow + ".");
+					}
 				}
 			}
-			
+
 			return stringBuilder.toString();
 		}
-		
+
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
 			mMode = null;
@@ -167,8 +169,8 @@ public class CABSelection extends SherlockActivity {
 		SparseBooleanArray mHighlightedItems = new SparseBooleanArray();
 
 		public SelectionAdapter(Context context, int resource,
-				int textViewResourceId, List<String> objects) {
-			super(context, resource, textViewResourceId, objects);
+				int textViewResourceId, String[] items) {
+			super(context, resource, textViewResourceId, items);
 		}
 
 		public void pressItem(int position) {
@@ -241,5 +243,43 @@ public class CABSelection extends SherlockActivity {
 		}
 
 	}
+
+	// NB: Taken from the next awesomely looking post:
+	//     http://www.japan-talk.com/jt/new/101-kinds-of-sushi-in-Japan
+	public static final String SUSHIS[] = {
+		"1. Maguro Nigiri",
+		"2. Kappa Maki",
+		"3. Sake Nigiri",
+		"4. Ikura Gukan",
+		"5. Toro",
+		"6. Uni",
+		"7. Amaebi",
+		"8. Ebi Nigiri",
+		"9. Hamachi",
+		"10. Anago",
+		"11. Ika Nigiri",
+		"12. Hotate Nigiri",
+		"13. Tamagoyaki",
+		"14. Tako Nigiri",
+		"15. Tai",
+		"16. Aji",
+		"17. Tekkamaki",
+		"18. Saba",
+		"19. California Roll",
+		"20. Futomaki",
+		"21. Unagi",
+		"22. Ayu",
+		"23. Natto Maki",
+		"24. Sanma",
+		"25. Negitoro",
+		"26. Kani Nigiri",
+		"27. Kamaboko Kani",
+		"28. Umeboshi",
+		"29. Shako Nigiri",
+		"30. Daikon Oshinko Maki",
+		"31. Ankimo",
+		"32. Mentaiko",
+		"33. Temaki"
+	};
 
 }

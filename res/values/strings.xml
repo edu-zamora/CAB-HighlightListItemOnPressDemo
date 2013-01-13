@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">HighlightListItemPressed</string>
+    <string name="app_name">Demo - Highlight Item on Press</string>
 
     <plurals name="number_of_selected_rows">
-        <item quantity="one">1 row</item>
-        <item quantity="other">%d rows</item>
+        <item quantity="one">1 sushi selected</item>
+        <item quantity="other">%d sushis selected</item>
     </plurals>
 
 </resources>
