@@ -38,12 +38,14 @@ public class CABSelection extends SherlockActivity {
 			mItems.add("Name" + i);
 		}
 
-		mAdapter = new SelectionAdapter(this,
-				R.layout.adapters_cabselection_row, R.id.the_text, mItems);
+		mAdapter = new SelectionAdapter(this, R.layout.adapters_cabselection_row, R.id.the_text, mItems);
 		mListView = (PressListView) findViewById(R.id.list);
 		mListView.setAdapter(mAdapter);
 		mListView.setSelector(R.drawable.list_selector);
-
+		// TODO: Is this needed?
+		mListView.setItemsCanFocus(false);
+		mListView.setFocusableInTouchMode(false);
+		
 		mListView.setOnItemPressListener(new OnItemPressListener() {
 			
 			@Override
@@ -60,10 +62,7 @@ public class CABSelection extends SherlockActivity {
 			}
 
 		});
-		
-		// TODO: Is this needed?
-		mListView.setItemsCanFocus(false);
-		mListView.setFocusableInTouchMode(false);
+
 		mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 
 			@Override
@@ -72,71 +71,7 @@ public class CABSelection extends SherlockActivity {
 				Log.i("TAG", "onItemLongClick");
 
 				if (mMode == null) {
-					startActionMode(new ActionMode.Callback() {
-
-						@Override
-						public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-							mMode = mode;
-							mListView.setSelector(R.drawable.list_selector_cab);
-							mAdapter.notifyDataSetChanged();
-							MenuInflater inflater = getSupportMenuInflater();
-							inflater.inflate(R.menu.cabselection_menu, menu);
-							return true;
-						}
-
-						@Override
-						public boolean onPrepareActionMode(ActionMode mode,
-								Menu menu) {
-
-							int nr = mAdapter.getHighlightedPositionsCount();
-							// TODO: Use localization plurals for this
-							if (nr == 1) {
-								mode.setTitle(nr + " row");
-							} else {
-								mode.setTitle(nr + " rows");	
-							}
-
-							return false;
-						}
-
-						@Override
-						public boolean onActionItemClicked(ActionMode mode,
-								MenuItem item) {
-							StringBuilder sb = new StringBuilder();
-							List<Integer> positions = mAdapter.getHighlightedPositions();
-							for (int i = 0; i < positions.size(); i++) {
-								sb.append(" " + i + ",");	
-							}               
-							switch (item.getItemId()) {
-							case R.id.select_none:
-								mAdapter.unhighlightAllItems();
-								mode.invalidate();
-								break;
-							case R.id.select_all:
-								mAdapter.highlightAllItems();
-								mode.invalidate();
-								break;
-							case R.id.edit_entry:
-								Toast.makeText(CABSelection.this, "Edited entries: " + sb.toString(),
-										Toast.LENGTH_SHORT).show();
-								break;
-							case R.id.delete_entry:
-								Toast.makeText(CABSelection.this, "Deleted entries : " + sb.toString(),
-										Toast.LENGTH_SHORT).show();
-								break;
-							}
-							return false;
-						}
-
-						@Override
-						public void onDestroyActionMode(ActionMode mode) {
-							// TODO: Is the null assignment needed?
-							mMode = null;
-							mListView.setSelector(R.drawable.list_selector);
-							mAdapter.unhighlightAllItems();
-						}
-
-					});
+					startActionMode(new ActionModeCallback());
 				}
 
 				onListItemClick(position);
@@ -159,6 +94,69 @@ public class CABSelection extends SherlockActivity {
 		}
 	}
 	
+	private class ActionModeCallback implements ActionMode.Callback {
+		
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			mMode = mode;
+			mListView.setSelector(R.drawable.list_selector_cab);
+			mAdapter.notifyDataSetChanged();
+			MenuInflater inflater = getSupportMenuInflater();
+			inflater.inflate(R.menu.cabselection_menu, menu);
+			return true;
+		}
+		
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			int nr = mAdapter.getHighlightedPositionsCount();
+			// TODO: Use localization plurals for this
+			if (nr == 1) {
+				mode.setTitle(nr + " row");
+			} else {
+				mode.setTitle(nr + " rows");	
+			}
+
+			return false;
+		}
+		
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			StringBuilder sb = new StringBuilder();
+			List<Integer> positions = mAdapter.getHighlightedPositions();
+			for (int i = 0; i < positions.size(); i++) {
+				sb.append(" " + i + ",");	
+			}               
+			switch (item.getItemId()) {
+			case R.id.select_none:
+				mAdapter.unhighlightAllItems();
+				mode.invalidate();
+				break;
+			case R.id.select_all:
+				mAdapter.highlightAllItems();
+				mode.invalidate();
+				break;
+			case R.id.edit_entry:
+				Toast.makeText(CABSelection.this, "Edited entries: " + sb.toString(),
+						Toast.LENGTH_SHORT).show();
+				break;
+			case R.id.delete_entry:
+				Toast.makeText(CABSelection.this, "Deleted entries : " + sb.toString(),
+						Toast.LENGTH_SHORT).show();
+				break;
+			}
+			return false;
+		}
+		
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			// TODO: Is the null assignment needed?
+			mMode = null;
+			mListView.setSelector(R.drawable.list_selector);
+			mAdapter.unhighlightAllItems();	
+		}
+		
+	};
+
 	private class SelectionAdapter extends ArrayAdapter<String> {
 
 		SparseBooleanArray mWasHighlightedBeforePress = new SparseBooleanArray();
@@ -194,9 +192,8 @@ public class CABSelection extends SherlockActivity {
 
 			int numPositions = mHighlightedItems.size();
 			for(int i = 0; i < numPositions; i++) {
-				int position = mHighlightedItems.keyAt(i);
-				if (isHighlighted(position)) {
-					highlightedPositions.add(position);
+				if (mHighlightedItems.valueAt(i)) {
+					highlightedPositions.add(mHighlightedItems.keyAt(i));
 				}
 			}
 
