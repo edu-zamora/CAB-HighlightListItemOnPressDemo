@@ -110,17 +110,11 @@ public class CABSelection extends SherlockActivity {
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			updateTitle(mode);
-
 			return false;
 		}
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			StringBuilder sb = new StringBuilder();
-			List<Integer> positions = mAdapter.getHighlightedPositions();
-			for (int i = 0; i < positions.size(); i++) {
-				sb.append(" " + i + ",");	
-			}               
 			switch (item.getItemId()) {
 			case R.id.select_none:
 				mAdapter.unhighlightAllItems();
@@ -131,17 +125,32 @@ public class CABSelection extends SherlockActivity {
 				mode.invalidate();
 				break;
 			case R.id.edit_entry:
-				Toast.makeText(CABSelection.this, "Edited entries: " + sb.toString(),
+				Toast.makeText(CABSelection.this, "Edited items: " + highlightedItemsString(),
 						Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.delete_entry:
-				Toast.makeText(CABSelection.this, "Deleted entries : " + sb.toString(),
+				Toast.makeText(CABSelection.this, "Deleted items: " + highlightedItemsString(),
 						Toast.LENGTH_SHORT).show();
 				break;
 			}
 			return false;
 		}
 
+		private String highlightedItemsString() {
+			StringBuilder stringBuilder = new StringBuilder();
+			
+			List<Integer> positions = mAdapter.getHighlightedPositions();
+			for (int i = 0; i < positions.size(); i++) {
+				if (i != (positions.size() - 1)) {
+					stringBuilder.append(" " + positions.get(i) + ",");
+				} else {
+					stringBuilder.append(" " + positions.get(i) + ".");
+				}
+			}
+			
+			return stringBuilder.toString();
+		}
+		
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
 			// TODO: Is the null assignment needed?
