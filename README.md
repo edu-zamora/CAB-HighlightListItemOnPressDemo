@@ -46,6 +46,12 @@ License
     See the License for the specific language governing permissions and
     limitations under the License.
 
+Screenshots
+===========
+
+[![Normal list](https://raw.github.com/lexs/android-delicious/master/screenshots/2_small.png)](https://raw.github.com/lexs/android-delicious/master/screenshots/2.png)
+
+[![CAB Mode](https://raw.github.com/edu-zamora/CAB-HighlightListItemOnPressDemo/master/screenshots/normal_list.png)](https://raw.github.com/edu-zamora/CAB-HighlightListItemOnPressDemo/master/screenshots/normal_list.png)
 
 [1]: https://play.google.com/store/apps/details?id=ch.teamtasks.tasks
 [2]: https://github.com/JakeWharton/ActionBarSherlock
