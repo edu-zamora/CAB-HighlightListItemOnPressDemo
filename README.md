@@ -18,6 +18,11 @@ Usage
 In order to test the CAB, perform a long click over any of the items.
 You can select/unselect items both using touches or the D-pad/trackpad.
 
+Acknowledgements
+================
+
+This demo project uses the Open Source library [ActionBarSherlock][2], from [Jake Wharton][3].
+
 Developed By
 ============
 
@@ -43,3 +48,5 @@ License
 
 
 [1]: https://play.google.com/store/apps/details?id=ch.teamtasks.tasks
+[2]: https://github.com/JakeWharton/ActionBarSherlock
+[3]: http://jakewharton.com/
