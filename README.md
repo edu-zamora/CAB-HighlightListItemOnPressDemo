@@ -49,9 +49,9 @@ License
 Screenshots
 ===========
 
-[![Normal list](https://raw.github.com/lexs/android-delicious/master/screenshots/2_small.png)](https://raw.github.com/lexs/android-delicious/master/screenshots/2.png)
+[![Normal list](https://raw.github.com/edu-zamora/CAB-HighlightListItemOnPressDemo/master/screenshots/normal_list.png)](https://raw.github.com/edu-zamora/CAB-HighlightListItemOnPressDemo/master/screenshots/normal_list.png)
 
-[![CAB Mode](https://raw.github.com/edu-zamora/CAB-HighlightListItemOnPressDemo/master/screenshots/normal_list.png)](https://raw.github.com/edu-zamora/CAB-HighlightListItemOnPressDemo/master/screenshots/normal_list.png)
+[![CAB Mode](https://raw.github.com/edu-zamora/CAB-HighlightListItemOnPressDemo/master/screenshots/cab.png)](https://raw.github.com/edu-zamora/CAB-HighlightListItemOnPressDemo/master/screenshots/cab.png)
 
 [1]: https://play.google.com/store/apps/details?id=ch.teamtasks.tasks
 [2]: https://github.com/JakeWharton/ActionBarSherlock
